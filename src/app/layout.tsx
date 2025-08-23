@@ -1,6 +1,12 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { ReactQueryClientProvider } from "@/components/tw-blocks/providers/ReactQueryClientProvider";
+import { TrustlessWorkProvider } from "@/components/tw-blocks/providers/TrustlessWork";
+import { WalletProvider } from "@/components/tw-blocks/wallet-kit/WalletProvider";
+import { EscrowProvider } from "@/components/tw-blocks/escrows/escrow-context/EscrowProvider";
+import { EscrowDialogsProvider } from "@/components/tw-blocks/escrows/escrow-context/EscrowDialogsProvider";
+import { EscrowAmountProvider } from "@/components/tw-blocks/escrows/escrow-context/EscrowAmountProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,7 +33,17 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        <ReactQueryClientProvider>
+          <TrustlessWorkProvider>
+            <WalletProvider>
+              <EscrowProvider>
+                <EscrowAmountProvider>
+                  <EscrowDialogsProvider>{children}</EscrowDialogsProvider>
+                </EscrowAmountProvider>
+              </EscrowProvider>
+            </WalletProvider>
+          </TrustlessWorkProvider>
+        </ReactQueryClientProvider>
       </body>
     </html>
   );

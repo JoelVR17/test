@@ -1,0 +1,86 @@
+"use client";
+
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import Link from "next/link";
+
+interface EntityCardProps {
+  entity?: string;
+  type: string;
+  hasPercentage?: boolean;
+  percentage?: number;
+  amount?: number;
+  inDispute?: boolean;
+  isNet?: boolean;
+}
+
+const EntityCard = ({
+  entity,
+  type,
+  hasPercentage,
+  percentage,
+  amount,
+  inDispute,
+  isNet,
+}: EntityCardProps) => {
+  const formatAddress = (address: string) => {
+    return `${address.slice(0, 4)}...${address.slice(-4)}`;
+  };
+
+  return (
+    <Card className="w-full overflow-hidden transition-all duration-200 hover:shadow-md">
+      <Link href={`/dashboard/public-profile/${entity}`} target="_blank">
+        <CardContent className="p-3">
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex w-full items-center justify-between gap-2">
+              <span className="text-xs font-medium text-muted-foreground">
+                {type}
+              </span>
+              {inDispute && <Badge variant="destructive">In Dispute</Badge>}
+            </div>
+
+            <div className="flex items-center gap-2 text-xs">
+              {hasPercentage && (
+                <div className="flex items-center">
+                  <span className="text-muted-foreground mr-1">Fee:</span>
+                  <span className="font-medium text-emerald-600">
+                    {percentage}%
+                  </span>
+                </div>
+              )}
+            </div>
+          </div>
+
+          <Separator className="my-2" />
+
+          <div className="flex items-center gap-3 py-1">
+            <Avatar className="h-9 w-9 rounded-md border">
+              <AvatarFallback className="rounded-md bg-background text-foreground">
+                {entity?.[0] || "?"}
+              </AvatarFallback>
+            </Avatar>
+
+            <div className="flex flex-col">
+              {entity && (
+                <span className="text-sm font-medium leading-tight">
+                  {entity}
+                </span>
+              )}
+              {entity && (
+                <span className="text-xs text-muted-foreground">
+                  {type === "Trustless Work"
+                    ? "Private"
+                    : formatAddress(entity)}
+                </span>
+              )}
+            </div>
+          </div>
+        </CardContent>
+      </Link>
+    </Card>
+  );
+};
+
+export default EntityCard;
