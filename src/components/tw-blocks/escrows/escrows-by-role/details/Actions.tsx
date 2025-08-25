@@ -1,4 +1,3 @@
-import { useEscrowDialogs } from "../../escrow-context/EscrowDialogsProvider";
 import {
   DollarSign,
   CheckCircle,
@@ -16,18 +15,17 @@ import {
   GetEscrowsFromIndexerResponse as Escrow,
   Role,
 } from "@trustless-work/escrow/types";
-import { Button } from "@/components/ui/button";
 import DisputeEscrowButton from "../../single-release/dispute-escrow/button/DisputeEscrow";
 import ResolveDisputeDialog from "../../single-release/resolve-dispute/dialog/ResolveDispute";
 import ReleaseEscrowButton from "../../single-release/release-escrow/button/ReleaseEscrow";
 import FundEscrowDialog from "../../single-release/fund-escrow/dialog/FundEscrow";
+import UpdateEscrowDialog from "../../single-release/update-escrow/dialog/UpdateEscrow";
 
 interface ActionsProps {
   selectedEscrow: Escrow;
   userRolesInEscrow: string[];
-  areAllMilestonesCompleted: boolean;
-  areAllMilestonesCompletedAndFlag: boolean;
-  activeRole: Role;
+  areAllMilestonesApproved: boolean;
+  activeRole: Role[];
 }
 
 export const roleActions: {
@@ -93,42 +91,39 @@ export const actionIcons: Record<string, React.ReactNode> = {
 export const Actions = ({
   selectedEscrow,
   userRolesInEscrow,
-  areAllMilestonesCompleted,
-  areAllMilestonesCompletedAndFlag,
+  areAllMilestonesApproved,
   activeRole,
 }: ActionsProps) => {
-  const dialogStates = useEscrowDialogs();
-
   // Check if any of the conditional buttons should be displayed
   const shouldShowEditButton =
     userRolesInEscrow.includes("platformAddress") &&
     !selectedEscrow?.flags?.disputed &&
     !selectedEscrow?.flags?.resolved &&
     !selectedEscrow?.flags?.released &&
-    activeRole === "platformAddress";
+    activeRole.includes("platformAddress");
 
   const shouldShowDisputeButton =
     selectedEscrow.type === "single-release" &&
     (userRolesInEscrow.includes("approver") ||
       userRolesInEscrow.includes("serviceProvider")) &&
-    (activeRole === "approver" || activeRole === "serviceProvider") &&
+    (activeRole.includes("approver") ||
+      activeRole.includes("serviceProvider")) &&
     !selectedEscrow?.flags?.disputed &&
     !selectedEscrow?.flags?.resolved;
 
   const shouldShowResolveButton =
     selectedEscrow.type === "single-release" &&
     userRolesInEscrow.includes("disputeResolver") &&
-    activeRole === "disputeResolver" &&
+    activeRole.includes("disputeResolver") &&
     !selectedEscrow?.flags?.resolved &&
     selectedEscrow?.flags?.disputed;
 
   const shouldShowReleaseFundsButton =
     selectedEscrow.type === "single-release" &&
-    areAllMilestonesCompleted &&
-    areAllMilestonesCompletedAndFlag &&
+    areAllMilestonesApproved &&
     userRolesInEscrow.includes("releaseSigner") &&
     !selectedEscrow.flags?.released &&
-    activeRole === "releaseSigner";
+    activeRole.includes("releaseSigner");
 
   const hasConditionalButtons =
     shouldShowEditButton ||
@@ -140,20 +135,7 @@ export const Actions = ({
     <div className="flex items-start justify-start flex-col gap-2 w-full">
       {hasConditionalButtons && (
         <div className="flex flex-col sm:flex-row gap-2 w-full">
-          {shouldShowEditButton && (
-            <Button
-              disabled={selectedEscrow.balance !== 0}
-              onClick={(e) => {
-                e.stopPropagation();
-                dialogStates.editBasicProperties.setIsOpen(true);
-              }}
-              className="w-full"
-              variant="outline"
-            >
-              <Pencil className="mr-2 h-4 w-4" />
-              Edit Escrow
-            </Button>
-          )}
+          {shouldShowEditButton && <UpdateEscrowDialog />}
 
           {shouldShowDisputeButton && <DisputeEscrowButton />}
 

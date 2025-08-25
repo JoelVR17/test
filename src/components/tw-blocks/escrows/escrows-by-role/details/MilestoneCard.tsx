@@ -1,4 +1,5 @@
 "use client";
+import React from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -30,14 +31,14 @@ interface MilestoneCardProps {
   milestoneIndex: number;
   selectedEscrow: Escrow;
   userRolesInEscrow: string[];
-  activeRole: Role;
+  activeRole: Role[];
   onViewDetails: (
     milestone: SingleReleaseMilestone | MultiReleaseMilestone,
     index: number
   ) => void;
 }
 
-export const MilestoneCard = ({
+const MilestoneCardComponent = ({
   milestone,
   milestoneIndex,
   selectedEscrow,
@@ -105,59 +106,64 @@ export const MilestoneCard = ({
     milestone: SingleReleaseMilestone | MultiReleaseMilestone,
     milestoneIndex: number,
     userRolesInEscrow: string[],
-    activeRole: Role
+    activeRole: Role[]
   ) => {
     const buttons = [];
-
+    // removed noisy console.log that caused N logs per card render
     // Service Provider - Complete Milestone
     if (
       userRolesInEscrow.includes("serviceProvider") &&
-      activeRole === "serviceProvider" &&
+      activeRole.includes("serviceProvider") &&
       milestone.status !== "completed" &&
       !("flags" in milestone && milestone.flags?.approved)
     ) {
-      buttons.push(<ChangeMilestoneStatusDialog />);
+      buttons.push(
+        <ChangeMilestoneStatusDialog
+          key={`change-status-${milestoneIndex}`}
+          milestoneIndex={milestoneIndex}
+        />
+      );
     }
 
     // Release Signer - Release Payment
     if (
       userRolesInEscrow.includes("releaseSigner") &&
-      activeRole === "releaseSigner" &&
+      activeRole.includes("releaseSigner") &&
       "flags" in milestone &&
       !milestone.flags?.disputed &&
       milestone.flags?.approved &&
       !milestone.flags?.released
     ) {
-      buttons.push(<ReleaseEscrowButton />);
+      buttons.push(<ReleaseEscrowButton key={`release-${milestoneIndex}`} />);
     }
 
     // Service Provider/Approver - Start Dispute
     if (
       (userRolesInEscrow.includes("serviceProvider") ||
         userRolesInEscrow.includes("approver")) &&
-      (activeRole === "serviceProvider" || activeRole === "approver") &&
+      (activeRole.includes("serviceProvider") ||
+        activeRole.includes("approver")) &&
       "flags" in milestone &&
       !milestone.flags?.disputed &&
       !milestone.flags?.released &&
       !milestone.flags?.resolved
     ) {
-      buttons.push(<DisputeEscrowButton />);
+      buttons.push(<DisputeEscrowButton key={`dispute-${milestoneIndex}`} />);
     }
 
     // Dispute Resolver - Resolve Dispute
     if (
       userRolesInEscrow.includes("disputeResolver") &&
-      activeRole === "disputeResolver" &&
+      activeRole.includes("disputeResolver") &&
       "flags" in milestone &&
       milestone.flags?.disputed
     ) {
-      buttons.push(<ResolveDisputeDialog />);
+      buttons.push(<ResolveDisputeDialog key={`resolve-${milestoneIndex}`} />);
     }
     // Approver - Approve Milestone
     if (
       userRolesInEscrow.includes("approver") &&
-      activeRole === "approver" &&
-      milestone.status === "completed" &&
+      activeRole.includes("approver") &&
       (("approved" in milestone && !milestone.approved) ||
         ("flags" in milestone &&
           !milestone.flags?.approved &&
@@ -168,7 +174,12 @@ export const MilestoneCard = ({
           "flags" in milestone &&
           !milestone.flags?.resolved))
     ) {
-      buttons.push(<ApproveMilestoneButton milestoneIndex={milestoneIndex} />);
+      buttons.push(
+        <ApproveMilestoneButton
+          key={`approve-${milestoneIndex}`}
+          milestoneIndex={milestoneIndex}
+        />
+      );
     }
 
     return buttons;
@@ -237,3 +248,23 @@ export const MilestoneCard = ({
     </Card>
   );
 };
+
+export const MilestoneCard = React.memo(
+  MilestoneCardComponent,
+  (prev, next) => {
+    // Prevent unnecessary re-renders when props are referentially equal
+    if (
+      prev.milestone === next.milestone &&
+      prev.milestoneIndex === next.milestoneIndex &&
+      prev.selectedEscrow?.contractId === next.selectedEscrow?.contractId &&
+      prev.onViewDetails === next.onViewDetails &&
+      prev.activeRole.length === next.activeRole.length &&
+      prev.userRolesInEscrow.length === next.userRolesInEscrow.length &&
+      prev.activeRole.every((r, i) => r === next.activeRole[i]) &&
+      prev.userRolesInEscrow.every((r, i) => r === next.userRolesInEscrow[i])
+    ) {
+      return true;
+    }
+    return false;
+  }
+);

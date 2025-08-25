@@ -26,17 +26,24 @@ const EntityCard = ({
   isNet,
 }: EntityCardProps) => {
   const formatAddress = (address: string) => {
-    return `${address.slice(0, 4)}...${address.slice(-4)}`;
+    return `${address.slice(0, 10)}...${address.slice(-4)}`;
+  };
+
+  const formatRole = (role: string) => {
+    return role
+      .replace(/([A-Z])/g, " $1")
+      .replace(/^./, (str) => str.toUpperCase())
+      .trim();
   };
 
   return (
-    <Card className="w-full overflow-hidden transition-all duration-200 hover:shadow-md">
+    <Card className="w-full overflow-hidden transition-all duration-200 hover:shadow-md py-2">
       <Link href={`/dashboard/public-profile/${entity}`} target="_blank">
         <CardContent className="p-3">
           <div className="flex items-center justify-between mb-2">
             <div className="flex w-full items-center justify-between gap-2">
               <span className="text-xs font-medium text-muted-foreground">
-                {type}
+                {formatRole(type)}
               </span>
               {inDispute && <Badge variant="destructive">In Dispute</Badge>}
             </div>
@@ -65,7 +72,7 @@ const EntityCard = ({
             <div className="flex flex-col">
               {entity && (
                 <span className="text-sm font-medium leading-tight">
-                  {entity}
+                  {formatAddress(entity)}
                 </span>
               )}
               {entity && (

@@ -68,6 +68,7 @@ export function EscrowsByRoleCards() {
   } = useEscrowsByRole();
 
   const { setSelectedEscrow } = useEscrowContext();
+
   const dialogStates = useEscrowDialogs();
 
   const formatCurrency = (value: number, currency: string) => {
@@ -124,9 +125,7 @@ export function EscrowsByRoleCards() {
     dialogStates.second.setIsOpen(true);
   };
 
-  const activeRole = useMemo(() => {
-    return role;
-  }, [role]);
+  const activeRole: Role[] = role.split(",") as Role[];
 
   return (
     <>
@@ -343,7 +342,7 @@ export function EscrowsByRoleCards() {
                                 .slice(0, 3)
                                 .map((milestone) => (
                                   <li
-                                    key={milestone.description.slice(0, 5)}
+                                    key={`milestone-${milestone.description}-${milestone.status}`}
                                     className="text-xs flex justify-between"
                                   >
                                     {milestone.description}

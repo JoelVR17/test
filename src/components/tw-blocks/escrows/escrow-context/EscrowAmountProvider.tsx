@@ -1,7 +1,14 @@
 "use client";
 
 import * as React from "react";
-import { createContext, useContext, useMemo, useState, ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useMemo,
+  useState,
+  ReactNode,
+  useCallback,
+} from "react";
 
 export type AmountEscrowStore = {
   receiverAmount: number;
@@ -28,17 +35,17 @@ export const EscrowAmountProvider = ({ children }: { children: ReactNode }) => {
   const [approverResolve, setApproverResolve] = useState(0);
   const [amountMoonpay, setAmountMoonpay] = useState(0);
 
-  const setAmounts: AmountEscrowStore["setAmounts"] = (
-    totalAmount,
-    platformFee
-  ) => {
-    const trustlessPercentage = 0.3;
-    const receiverPercentage = 100 - (trustlessPercentage + platformFee);
+  const setAmounts: AmountEscrowStore["setAmounts"] = useCallback(
+    (totalAmount, platformFee) => {
+      const trustlessPercentage = 0.3;
+      const receiverPercentage = 100 - (trustlessPercentage + platformFee);
 
-    setReceiverAmount((totalAmount * receiverPercentage) / 100);
-    setPlatformFeeAmount((totalAmount * platformFee) / 100);
-    setTrustlessWorkAmount((totalAmount * trustlessPercentage) / 100);
-  };
+      setReceiverAmount((totalAmount * receiverPercentage) / 100);
+      setPlatformFeeAmount((totalAmount * platformFee) / 100);
+      setTrustlessWorkAmount((totalAmount * trustlessPercentage) / 100);
+    },
+    []
+  );
 
   const value = useMemo<AmountEscrowStore>(
     () => ({

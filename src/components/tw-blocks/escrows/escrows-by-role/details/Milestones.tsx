@@ -1,9 +1,6 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { Pencil } from "lucide-react";
-import { useEscrowDialogs } from "../../escrow-context/EscrowDialogsProvider";
-import { useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { GetEscrowsFromIndexerResponse as Escrow } from "@trustless-work/escrow/types";
 import {
   MultiReleaseMilestone,
@@ -20,7 +17,7 @@ interface MilestonesProps {
     React.SetStateAction<Record<number, boolean>>
   >;
   evidenceVisibleMap: Record<number, boolean>;
-  activeRole: Role;
+  activeRole: Role[];
 }
 
 export const Milestones = ({
@@ -30,22 +27,23 @@ export const Milestones = ({
   evidenceVisibleMap,
   activeRole,
 }: MilestonesProps) => {
-  const dialogStates = useEscrowDialogs();
-
   const [selectedMilestoneForDetail, setSelectedMilestoneForDetail] = useState<{
     milestone: SingleReleaseMilestone | MultiReleaseMilestone;
     index: number;
   } | null>(null);
 
-  const handleViewDetails = (
-    milestone: SingleReleaseMilestone | MultiReleaseMilestone,
-    index: number
-  ) => {
-    setSelectedMilestoneForDetail({
-      milestone,
-      index,
-    });
-  };
+  const handleViewDetails = useCallback(
+    (
+      milestone: SingleReleaseMilestone | MultiReleaseMilestone,
+      index: number
+    ) => {
+      setSelectedMilestoneForDetail({
+        milestone,
+        index,
+      });
+    },
+    []
+  );
 
   return (
     <div className="flex w-full">
@@ -58,27 +56,6 @@ export const Milestones = ({
           >
             Milestones
           </label>
-
-          <div className="flex gap-4 items-center">
-            {userRolesInEscrow.includes("platformAddress") &&
-              !selectedEscrow?.flags?.disputed &&
-              !selectedEscrow?.flags?.resolved &&
-              !selectedEscrow?.flags?.released &&
-              activeRole === "platformAddress" && (
-                <Button
-                  disabled={selectedEscrow.balance !== 0}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    dialogStates.editMilestone.setIsOpen(true);
-                  }}
-                  className="text-sm"
-                  variant="ghost"
-                >
-                  <Pencil className="w-4 h-4 mr-2" />
-                  Edit Milestones
-                </Button>
-              )}
-          </div>
         </div>
 
         {/* Milestones Grid */}

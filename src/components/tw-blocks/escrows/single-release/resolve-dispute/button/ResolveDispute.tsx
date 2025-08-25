@@ -21,7 +21,7 @@ export default function ResolveDisputeButton({
   receiverFunds,
 }: ResolveDisputeButtonProps) {
   const { resolveDispute } = useEscrowsMutations();
-  const { escrow } = useEscrowContext();
+  const { selectedEscrow } = useEscrowContext();
   const { walletAddress } = useWalletContext();
   const [isSubmitting, setIsSubmitting] = React.useState(false);
 
@@ -45,7 +45,7 @@ export default function ResolveDisputeButton({
       setIsSubmitting(true);
 
       const payload: SingleReleaseResolveDisputePayload = {
-        contractId: escrow?.contractId || "",
+        contractId: selectedEscrow?.contractId || "",
         disputeResolver: walletAddress || "",
         approverFunds: Number(approverFunds),
         receiverFunds: Number(receiverFunds),

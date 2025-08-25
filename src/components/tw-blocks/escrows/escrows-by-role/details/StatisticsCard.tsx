@@ -39,7 +39,7 @@ export const StatisticsCard = ({
   return (
     <Card
       className={cn(
-        "overflow-hidden cursor-pointer hover:shadow-lg w-full",
+        "overflow-hidden cursor-pointer hover:shadow-lg w-full py-1",
         className
       )}
     >

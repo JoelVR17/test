@@ -31,17 +31,15 @@ interface GeneralInformationProps {
   selectedEscrow: GetEscrowsFromIndexerResponse;
   userRolesInEscrow: string[];
   dialogStates: DialogStates & StatusStates;
-  areAllMilestonesCompleted: boolean;
-  areAllMilestonesCompletedAndFlag: boolean;
-  activeRole: Role;
+  areAllMilestonesApproved: boolean;
+  activeRole: Role[];
 }
 
 export const GeneralInformation = ({
   selectedEscrow,
   userRolesInEscrow,
   dialogStates,
-  areAllMilestonesCompleted,
-  areAllMilestonesCompletedAndFlag,
+  areAllMilestonesApproved,
   activeRole,
 }: GeneralInformationProps) => {
   const [copiedKeyId, setCopiedKeyId] = useState(false);
@@ -136,8 +134,7 @@ export const GeneralInformation = ({
           <Actions
             selectedEscrow={selectedEscrow}
             userRolesInEscrow={userRolesInEscrow}
-            areAllMilestonesCompleted={areAllMilestonesCompleted}
-            areAllMilestonesCompletedAndFlag={areAllMilestonesCompletedAndFlag}
+            areAllMilestonesApproved={areAllMilestonesApproved}
             activeRole={activeRole}
           />
         </div>
@@ -154,8 +151,8 @@ export const GeneralInformation = ({
       >
         {/* Escrow ID and Actions */}
         <div className="lg:col-span-3">
-          <Card className="p-6 h-full">
-            <h3 className="text-lg font-semibold mb-6">Basic Information</h3>
+          <Card className="px-6 py-4 h-full">
+            <h3 className="text-lg font-semibold">Basic Information</h3>
             <div className="grid gap-4">
               {/* Escrow ID Section - Full Width */}
               <div className="p-4 bg-muted/50 rounded-lg border">
@@ -204,7 +201,10 @@ export const GeneralInformation = ({
                     {userRolesInEscrow.map((role) => {
                       const roleData = roleActions.find((r) => r.role === role);
                       return (
-                        <div className="p-2 bg-primary/10 rounded-md hover:bg-primary/20 transition-colors">
+                        <div
+                          key={role}
+                          className="p-2 bg-primary/10 rounded-md hover:bg-primary/20 transition-colors"
+                        >
                           {roleData?.icon || (
                             <Users className="h-4 w-4 text-primary" />
                           )}
@@ -267,11 +267,11 @@ export const GeneralInformation = ({
           !selectedEscrow.flags?.resolved && (
             <div className="lg:col-span-1">
               <Card className="p-4 h-full">
-                <h3 className="text-lg font-semibold mb-4">
+                <h3 className="text-lg font-semibold">
                   Release Amount Distribution
                 </h3>
                 <div className="space-y-4">
-                  <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                  <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg border">
                     <div className="flex items-center gap-2">
                       <CircleDollarSign className="h-4 w-4 text-primary" />
                       <div className="flex flex-col">
@@ -290,7 +290,7 @@ export const GeneralInformation = ({
                   </div>
 
                   <div className="space-y-2">
-                    <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                    <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg border">
                       <div className="flex items-center gap-2">
                         <Users className="h-4 w-4 text-primary" />
                         <div className="flex flex-col">
@@ -310,7 +310,7 @@ export const GeneralInformation = ({
                       </div>
                     </div>
 
-                    <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                    <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg border">
                       <div className="flex items-center gap-2">
                         <Wallet className="h-4 w-4 text-primary" />
                         <div className="flex flex-col">
@@ -331,7 +331,7 @@ export const GeneralInformation = ({
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                  <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg border">
                     <div className="flex items-center gap-2">
                       <Wallet className="h-4 w-4 text-primary" />
                       <div className="flex flex-col">

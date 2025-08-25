@@ -7,6 +7,7 @@ import { WalletProvider } from "@/components/tw-blocks/wallet-kit/WalletProvider
 import { EscrowProvider } from "@/components/tw-blocks/escrows/escrow-context/EscrowProvider";
 import { EscrowDialogsProvider } from "@/components/tw-blocks/escrows/escrow-context/EscrowDialogsProvider";
 import { EscrowAmountProvider } from "@/components/tw-blocks/escrows/escrow-context/EscrowAmountProvider";
+import { Toaster } from "sonner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -44,6 +45,8 @@ export default function RootLayout({
             </WalletProvider>
           </TrustlessWorkProvider>
         </ReactQueryClientProvider>
+
+        <Toaster position="top-right" />
       </body>
     </html>
   );
